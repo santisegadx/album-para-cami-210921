@@ -1,0 +1,410 @@
+/* --- Configuración Global --- */
+:root {
+    --color-fondo: #f0f2f5;
+    --color-primario: #c94b4b; /* Un tono más romántico */
+    --color-secundario: #4b134f;
+    --color-texto: #333;
+    --color-blanco: #ffffff;
+    --color-gris-claro: #ccc;
+    --sombra: 0 4px 12px rgba(0,0,0,0.1);
+    --brillo-rara: 0 0 15px 3px #007bff;
+    --brillo-legendaria: 0 0 20px 5px #ffd700;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body, html {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
+    line-height: 1.5;
+    height: 100%;
+    overflow: hidden; /* Evita el scroll en la app */
+}
+
+/* --- Vistas (Sections) --- */
+.view {
+    display: none; /* Ocultas por defecto */
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.view.activa {
+    display: flex; /* CAMBIO: ahora usamos flex para centrar */
+}
+
+/* --- Vista 1: Portada (Home) --- */
+#view-home {
+    flex-direction: column;
+    position: relative;
+}
+
+.home-background-collage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Reemplaza 'img/collage.jpg' por tu foto de collage */
+    background: url('https://placehold.co/800x1200/4b134f/c94b4b?text=Collage+de+Fotos') center center/cover;
+    filter: blur(5px) brightness(0.7); /* Desenfoque para que se lea el texto */
+    transform: scale(1.1);
+}
+
+.home-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: var(--color-blanco);
+    padding: 30px;
+    height: 100%;
+    width: 100%;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+#view-home h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+#view-home p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+}
+
+/* --- Estadísticas (Home) --- */
+#home-stats {
+    width: 90%;
+    max-width: 400px;
+    margin-bottom: 30px;
+}
+
+.progress-bar-container {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    height: 10px;
+    overflow: hidden;
+}
+
+#progress-bar {
+    height: 100%;
+    background-image: linear-gradient(135deg, var(--color-primario), #ff758c);
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
+
+#progress-text {
+    font-size: 0.9rem;
+    margin-top: 8px;
+    font-weight: 500;
+}
+
+/* --- Botones (Home) --- */
+.home-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 90%;
+    max-width: 400px;
+}
+
+.btn-principal, .btn-secundario {
+    padding: 15px;
+    border-radius: 30px;
+    border: none;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-principal {
+    background-image: linear-gradient(135deg, var(--color-primario), #ff758c);
+    color: var(--color-blanco);
+    box-shadow: 0 4px 15px rgba(201, 75, 75, 0.4);
+}
+
+.btn-principal:hover {
+    transform: translateY(-2px);
+}
+
+.btn-secundario {
+    background: rgba(255, 255, 255, 0.2); /* Botón "glassmorphism" */
+    color: var(--color-blanco);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.btn-secundario:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+
+/* --- Vista 2: Álbum (Revista) --- */
+/* CAMBIO: Ahora es flex para centrar el libro */
+#view-album {
+    background-color: #5d4037; /* Color sólido (ej. madera oscura) */
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+#btn-back-to-home {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 1010;
+}
+
+/* CAMBIO: Contenedor del libro (no es pantalla completa) */
+#album-container {
+    width: 90vw;
+    height: 70vh;
+    max-width: 900px;
+    max-height: 600px;
+    aspect-ratio: 16 / 10; /* Proporción de libro abierto */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+/* CAMBIO: Botones de navegación externos */
+.album-nav-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 1005;
+    transition: background 0.2s ease;
+}
+.album-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+/* Estilos de la biblioteca page-flip */
+#flipbook {
+    width: 100%;
+    height: 100%;
+}
+
+.page {
+    background: var(--color-blanco);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2) inset;
+}
+
+/* --- NUEVO: Tapa y Contratapa --- */
+.page.cover {
+    background-color: #3a2a24; /* Color genérico de tapa */
+    /* Aquí puedes poner tu textura:
+    background-image: url('img/textura-tapa.jpg');
+    background-size: cover; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+.cover-content {
+    border: 2px dashed rgba(255,255,255,0.5);
+    padding: 30px;
+    text-align: center;
+}
+.page.back-cover {
+    background-color: #3a2a24;
+    /* background-image: url('img/textura-contratapa.jpg'); */
+}
+
+
+/* CAMBIO: De 'grid' a 'relative' para posicionar figuritas */
+.page-content {
+    width: 100%;
+    height: 100%;
+    position: relative; /* <-- MUY IMPORTANTE */
+    padding: 20px;
+    background-size: cover;
+    background-position: center;
+}
+
+/* --- NUEVO: Fondos de página (para que los edites) --- */
+.fondo-pagina-1 {
+    background-color: #fff9e6;
+    /* background-image: url('img/fondo-pagina-1.jpg'); */
+}
+.fondo-pagina-2 {
+    background-color: #e6f7ff;
+    /* background-image: url('img/fondo-pagina-2.jpg'); */
+}
+.fondo-pagina-3 {
+    background-color: #f0e6ff;
+    /* background-image: url('img/fondo-pagina-3.jpg'); */
+}
+
+
+/* CAMBIO: De 'grid item' a 'absolute' */
+.sticker-slot {
+    position: absolute; /* <-- MUY IMPORTANTE */
+    /* width y aspect-ratio se quitan, se definen en data.js */
+    background-color: #eee;
+    border: 2px dashed var(--color-gris-claro);
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--color-gris-claro);
+    box-shadow: var(--sombra);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+}
+
+.sticker-slot.obtenida {
+    border: 3px solid white;
+    color: transparent;
+}
+
+.sticker-slot.obtenida.Rara { box-shadow: var(--sombra), var(--brillo-rara); }
+.sticker-slot.obtenida.Legendaria { box-shadow: var(--sombra), var(--brillo-legendaria); animation: pulse 1.5s infinite; }
+
+@keyframes pulse {
+    0% { box-shadow: var(--sombra), var(--brillo-legendaria); }
+    50% { box-shadow: var(--sombra), 0 0 30px 10px #ffd700; }
+    100% { box-shadow: var(--sombra), var(--brillo-legendaria); }
+}
+
+/* --- Modales (Sin cambios significativos) --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.modal-overlay.visible {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--color-blanco);
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.modal-content h2 {
+    color: var(--color-primario);
+    margin-bottom: 10px;
+}
+
+.modal-content p {
+    margin-bottom: 15px;
+}
+
+.modal-content button {
+    background-image: linear-gradient(135deg, var(--color-primario), var(--color-secundario));
+    color: var(--color-blanco);
+    border: none;
+    border-radius: 25px;
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 10px;
+}
+
+.modal-content button:disabled {
+    background-image: none;
+    background-color: var(--color-gris-claro);
+    cursor: not-allowed;
+}
+
+.modal-content .btn-cerrar-modal {
+    background: #eee;
+    color: #555;
+}
+
+.modal-content input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+/* --- Modal de Resultado --- */
+#nuevas-figuritas-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.nueva-figu-modal {
+    width: 80px;
+    aspect-ratio: 3 / 4;
+    background-size: cover;
+    background-position: center;
+    border-radius: 8px;
+    border: 2px solid white;
+}
+.nueva-figu-modal.Rara { box-shadow: var(--brillo-rara); }
+.nueva-figu-modal.Legendaria { box-shadow: var(--brillo-legendaria); }
+
+/* --- Botón Flotante (Repetidas) --- */
+#btn-open-repetidas {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-image: linear-gradient(135deg, var(--color-primario), var(--color-secundario));
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    cursor: pointer;
+    z-index: 100;
+}

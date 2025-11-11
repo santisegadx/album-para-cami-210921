@@ -1,0 +1,22 @@
+{
+    "name": "Nuestro Álbum de Amor",
+    "short_name": "NuestroÁlbum",
+    "description": "Un álbum digital de nuestros momentos.",
+    "start_url": "index.html",
+    "display": "standalone",
+    "background_color": "#f0f2f5",
+    "theme_color": "#c94b4b",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "iconos/icon-192.png",
+            "type": "image/png",
+            "sizes": "192x192"
+        },
+        {
+            "src": "iconos/icon-512.png",
+            "type": "image/png",
+            "sizes": "512x512"
+        }
+    ]
+}
