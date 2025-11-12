@@ -51,7 +51,7 @@ body, html {
 }
 
 .home-background-collage {
-    position: absolute;
+    position: relative;
     top: 0;
     left: 0;
     width: 100%;
@@ -84,7 +84,7 @@ body, html {
 }
 
 #view-home p {
-    /* position: absolute; */
+    position: relative;
     font-size: 1.2rem;
     margin-bottom: 30px;
 }
@@ -173,38 +173,79 @@ body, html {
 }
 
 #btn-back-to-home {
-    position: fixed;
-    top: 20px;
-    right: 20px;
+    position: absolute;
+
+    /* --- CAMBIO --- */
+    /* Lo posicionamos en la esquina superior derecha de la pantalla */
+    top: 1.5rem;  /* (aprox 24px) */
+    right: 1.5rem; /* (aprox 24px) */
+    /* --- FIN CAMBIO --- */
+
     background: rgba(0, 0, 0, 0.5);
     color: white;
     border: none;
     border-radius: 50%;
-    /* CAMBIO DE px A rem */
     width: 2.5rem;  /* (40px) */
     height: 2.5rem; /* (40px) */
     font-size: 1.25rem;
-    /* FIN CAMBIO */
     cursor: pointer;
     z-index: 1010;
 }
 
-/* CAMBIO: Contenedor del libro (no es pantalla completa) */
+/* --- NUEVO: Contenedor de álbum adaptable (v3) --- */
+
+/* Estas son las propiedades comunes (sombra y transición) */
 #album-container {
-    /* --- ESTADO DE TAPA (POR DEFECTO) --- */
-    width: 60vw; /* En pantallas pequeñas, ocupa el 90% del ancho */
-    max-width: 450px; /* En pantallas grandes, no mide más de 450px */
-    aspect-ratio: 8 / 10;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     
-    /* Transición suave cuando cambiamos de estado */
-    transition: max-width 0.3s ease, aspect-ratio 0.3s ease;
+    /* Adaptamos la transición para los nuevos cambios */
+    transition: width 0.3s ease, height 0.3s ease, aspect-ratio 0.3s ease;
 }
 
-/* --- ESTADO ABIERTO (CON LA CLASE) --- */
-#album-container.open {
-    max-width: 900px;
-    aspect-ratio: 16 / 10;
+/* --- 1. REGLAS PARA PANTALLA VERTICAL (CELULARES) --- */
+/* (Aquí escalamos por ANCHO) */
+@media (orientation: portrait) {
+    
+    /* ESTADO CERRADO (Tapa) */
+    #album-container {
+        /* La tapa es la mitad del ancho abierto (90vw / 2) */
+        width: 45vw; 
+        aspect-ratio: 8 / 10;
+        /* Ponemos un max-width para tablets verticales */
+        max-width: 300px; 
+    }
+
+    /* ESTADO ABIERTO */
+    #album-container.open {
+        /* Ocupa el 90% del ancho para ver las dos páginas */
+        width: 90vw;
+        aspect-ratio: 16 / 10;
+        /* El doble del max-width de la tapa */
+        max-width: 600px;
+    }
+}
+
+
+/* --- 2. REGLAS PARA PANTALLA HORIZONTAL (PC, TABLETS) --- */
+/* (Aquí escalamos por ALTO) */
+@media (orientation: landscape) {
+
+    /* ESTADO CERRADO (Tapa) */
+    #album-container {
+        /* La tapa ocupa el 85% del ALTO */
+        height: 85vh;
+        aspect-ratio: 8 / 10;
+        /* Límite para que no sea gigante en monitores 4K */
+        max-height: 800px; 
+    }
+
+    /* ESTADO ABIERTO */
+    #album-container.open {
+        /* Mantiene el 85% del ALTO */
+        height: 85vh;
+        aspect-ratio: 16 / 10;
+        max-height: 800px;
+    }
 }
 
 
@@ -230,7 +271,7 @@ body, html {
 
 /* Estilos de la biblioteca page-flip */
 #flipbook {
-    width: 100%;
+    width: 100;
     height: 100%;
 
     /* --- NUEVO: FIX DE CENTRADO (v2) --- */
@@ -261,8 +302,8 @@ body, html {
 .page.cover {
     background-color: #3a2a24; /* Color genérico de tapa */
     /* Aquí puedes poner tu textura:
-    background-image: url('img/textura-tapa.jpg');
-    background-size: cover; */
+    background-image: url('img/textura-tapa.jpg'); */
+    background-size: cover; 
     display: flex;
     justify-content: center;
     align-items: center;
