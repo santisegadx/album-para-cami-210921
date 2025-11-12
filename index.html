@@ -16,141 +16,151 @@
 </head>
 <body>
 
-        <!-- Pantalla de acceso -->
+    <!-- Pantalla de acceso -->
     <div id="login" style="text-align:center; margin-top: 20vh;">
         <h2>💖 Ingresá la clave</h2>
         <input type="password" id="password" placeholder="Escribí la clave" 
-                style="padding:0.6rem; border-radius:8px; border:1px solid #ccc;">
-        <button onclick="checkPassword()" 
+               style="padding:0.6rem; border-radius:8px; border:1px solid #ccc;">
+        <button id="btn-entrar" 
                 style="margin-left:0.5rem; padding:0.6rem 1rem; border-radius:8px; border:none; background:#ff9fcf; cursor:pointer;">
-        Entrar
+            Entrar
         </button>
-        <p id="error" style="color:red; display:none;">Clave incorrecta 😅</p>
+        <p id="error" style="color:red; display:none; margin-top:0.75rem;">Clave incorrecta 😅</p>
     </div>
 
-<!-- Contenido real del álbum -->
-<div id="content" style="display:none;">
+    <!-- Contenido real del álbum -->
+    <div id="content" style="display:none;">
 
-    <!-- Vista 1: Portada (Home) -->
-    <section id="view-home" class="view activa">
-        <div class="home-background-collage">
-            <!-- El fondo de collage se aplica con CSS -->
-            <!-- Asegúrate de cambiar esta URL en style.css -->
-        </div>
-        <div class="home-content">
-            <h1>Nuestro Álbum</h1>
-            <p>La historia de nosotros, una figurita a la vez.</p>
-            
-            <div id="home-stats">
-                <div class="progress-bar-container">
-                    <div id="progress-bar" style="width: 0%;"></div>
+        <!-- Vista 1: Portada (Home) -->
+        <section id="view-home" class="view activa">
+            <div class="home-background-collage"></div>
+            <div class="home-content">
+                <h1>Nuestro Álbum</h1>
+                <p>La historia de nosotros, una figurita a la vez.</p>
+                
+                <div id="home-stats">
+                    <div class="progress-bar-container">
+                        <div id="progress-bar" style="width: 0%;"></div>
+                    </div>
+                    <div id="progress-text">Completado: 0% (0 / 0)</div>
                 </div>
-                <div id="progress-text">Completado: 0% (0 / 0)</div>
-            </div>
 
-            <div class="home-buttons">
-                <button id="btn-goto-album" class="btn-principal">
-                    <span class="icon">&#128213;</span> Ver Álbum
-                </button>
-                <button id="btn-open-sobre-diario" class="btn-secundario">
-                    <span class="icon">&#127873;</span> Sobre Diario
-                </button>
-                <button id="btn-open-codigo" class="btn-secundario">
-                    <span class="icon">&#128274;</span> Canjear Código
-                </button>
+                <div class="home-buttons">
+                    <button id="btn-goto-album" class="btn-principal">
+                        <span class="icon">&#128213;</span> Ver Álbum
+                    </button>
+                    <button id="btn-open-sobre-diario" class="btn-secundario">
+                        <span class="icon">&#127873;</span> Sobre Diario
+                    </button>
+                    <button id="btn-open-codigo" class="btn-secundario">
+                        <span class="icon">&#128274;</span> Canjear Código
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Vista 2: Álbum (Revista) -->
+        <section id="view-album" class="view">
+            <button id="btn-back-to-home">&#10005; Cerrar Álbum</button>
+            
+            <!-- Botón de navegación IZQUIERDA -->
+            <button id="btn-album-prev" class="album-nav-btn">&#9664;</button>
+
+            <div id="album-container">
+                <div id="flipbook"></div>
+            </div>
+            
+            <!-- Botón de navegación DERECHA -->
+            <button id="btn-album-next" class="album-nav-btn">&#9654;</button>
+        </section>
+
+        <!-- --- MODALES --- -->
+
+        <!-- Modal para CÓDIGO SECRETO -->
+        <div id="modal-codigo" class="modal-overlay">
+            <div class="modal-content">
+                <h2>Código Secreto</h2>
+                <p>¿Tienes un código? ¡Canjéalo aquí!</p>
+                <input type="text" id="input-codigo" placeholder="Escribe el código...">
+                <button id="btn-canjear-codigo">Canjear</button>
+                <button class="btn-cerrar-modal" data-modal="modal-codigo">Cerrar</button>
             </div>
         </div>
-    </section>
 
-    <!-- Vista 2: Álbum (Revista) -->
-    <!-- CAMBIOS: Se agregaron botones de navegación externos -->
-    <section id="view-album" class="view">
-        <button id="btn-back-to-home">&#10005; Cerrar Álbum</button>
+        <!-- Modal para SOBRE DIARIO -->
+        <div id="modal-sobre-diario" class="modal-overlay">
+            <div class="modal-content">
+                <h2>Sobre Diario</h2>
+                <p id="sobre-diario-texto">¡Recibe 3 figuritas gratis cada 24 horas!</p>
+                <button id="btn-sobre-diario">Abrir Sobre Diario</button>
+                <small id="tiempo-restante"></small>
+                <button class="btn-cerrar-modal" data-modal="modal-sobre-diario">Cerrar</button>
+            </div>
+        </div>
         
-        <!-- Botón de navegación IZQUIERDA -->
-        <button id="btn-album-prev" class="album-nav-btn">
-            &#9664;
-        </button>
-
-        <div id="album-container">
-            <!-- El libro/revista se generará aquí por JS -->
-            <div id="flipbook">
-                <!-- Las páginas se insertan aquí -->
+        <!-- Modal para mostrar las figuritas NUEVAS -->
+        <div id="modal-resultado" class="modal-overlay">
+            <div class="modal-content">
+                <h2 id="modal-resultado-titulo">¡Nuevas Figuritas!</h2>
+                <div id="nuevas-figuritas-container"></div>
+                <button class="btn-cerrar-modal" data-modal="modal-resultado">Genial</button>
             </div>
         </div>
-        
-        <!-- Botón de navegación DERECHA -->
-        <button id="btn-album-next" class="album-nav-btn">
-            &#9654;
-        </button>
-    </section>
 
-
-    <!-- --- MODALES --- -->
-
-    <!-- Modal para CÓDIGO SECRETO -->
-    <div id="modal-codigo" class="modal-overlay">
-        <div class="modal-content">
-            <h2>Código Secreto</h2>
-            <p>¿Tienes un código? ¡Canjéalo aquí!</p>
-            <input type="text" id="input-codigo" placeholder="Escribe el código...">
-            <button id="btn-canjear-codigo">Canjear</button>
-            <button class="btn-cerrar-modal" data-modal="modal-codigo">Cerrar</button>
-        </div>
-    </div>
-
-    <!-- Modal para SOBRE DIARIO -->
-    <div id="modal-sobre-diario" class="modal-overlay">
-        <div class="modal-content">
-            <h2>Sobre Diario</h2>
-            <p id="sobre-diario-texto">¡Recibe 3 figuritas gratis cada 24 horas!</p>
-            <button id="btn-sobre-diario">Abrir Sobre Diario</button>
-            <small id="tiempo-restante"></small>
-            <button class="btn-cerrar-modal" data-modal="modal-sobre-diario">Cerrar</button>
-        </div>
-    </div>
-    
-    <!-- Modal para mostrar las figuritas NUEVAS -->
-    <div id="modal-resultado" class="modal-overlay">
-        <div class="modal-content">
-            <h2 id="modal-resultado-titulo">¡Nuevas Figuritas!</h2>
-            <div id="nuevas-figuritas-container">
-                <!-- app.js insertará las nuevas figuritas aquí -->
+        <!-- Modal para CANJEAR REPETIDAS -->
+        <div id="modal-repetidas" class="modal-overlay">
+            <div class="modal-content">
+                <h2>Repetidas</h2>
+                <p>Tienes <span id="conteo-repetidas">0</span> figuritas repetidas.</p>
+                <button id="btn-canjear-repetidas" disabled>Canjear 5 repetidas por 1 nueva</button>
+                <button class="btn-cerrar-modal" data-modal="modal-repetidas">Cerrar</button>
             </div>
-            <button class="btn-cerrar-modal" data-modal="modal-resultado">Genial</button>
         </div>
-    </div>
 
-    <!-- Modal para CANJEAR REPETIDAS (Bonus) -->
-    <div id="modal-repetidas" class="modal-overlay">
-        <div class="modal-content">
-            <h2>Repetidas</h2>
-            <p>Tienes <span id="conteo-repetidas">0</span> figuritas repetidas.</p>
-            <button id="btn-canjear-repetidas" disabled>Canjear 5 repetidas por 1 nueva</button>
-            <button class="btn-cerrar-modal" data-modal="modal-repetidas">Cerrar</button>
-        </div>
-    </div>
-    <!-- Botón flotante para Repetidas en la Home -->
-    <button id="btn-open-repetidas" class="btn-flotante">&#128230;</button>
+        <!-- Botón flotante para Repetidas en la Home -->
+        <button id="btn-open-repetidas" class="btn-flotante">&#128230;</button>
 
+        <!-- Scripts -->
+        <script src="pageflip.min.js"></script>
+        <script src="data.js"></script>
+        <script src="app.js"></script>
+    </div> <!-- Fin del contenido -->
 
-    <!-- Scripts (Siempre al final) -->
-    <script src="pageflip.min.js"></script> <!-- La biblioteca -->
-    <script src="data.js"></script>
-    <script src="app.js"></script>
+    <!-- 🔐 Script de contraseña cifrada (usa SHA-256, compatible con WebCrypto) -->
+    <script>
+      // SHA-256 hex del password "teamo2025"
+      // Calculado con SHA-256: "teamo2025" -> 
+      // 86b168f5915594ae92341c687264152eb4722f7a271afbc431e16fb276f80ae8
+      const HASH = "86b168f5915594ae92341c687264152eb4722f7a271afbc431e16fb276f80ae8";
 
-   <script>
-     const PASSWORD = "teamo2025"; // 💕 Cambiala por la que quieras
-
-     function checkPassword() {
-       const input = document.getElementById("password").value;
-       if (input === PASSWORD) {
-        document.getElementById("login").style.display = "none";
-        document.getElementById("content").style.display = "block";
-      } else {
-        document.getElementById("error").style.display = "block";
+      async function sha256Hex(text) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(text);
+        const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
       }
-    }
-  </script>
+
+      async function checkPassword() {
+        const input = document.getElementById("password").value.trim();
+        // hide previous error on new attempt
+        document.getElementById("error").style.display = "none";
+
+        const hashHex = await sha256Hex(input);
+        if (hashHex === HASH) {
+          document.getElementById("login").style.display = "none";
+          document.getElementById("content").style.display = "block";
+        } else {
+          document.getElementById("error").style.display = "block";
+        }
+      }
+
+      // Evento para el botón y para Enter
+      document.getElementById("btn-entrar").addEventListener("click", checkPassword);
+      document.getElementById("password").addEventListener("keyup", e => {
+        if (e.key === "Enter") checkPassword();
+      });
+    </script>
+
 </body>
 </html>

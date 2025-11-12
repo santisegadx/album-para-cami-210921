@@ -1,4 +1,20 @@
 // --- ESTE ES EL CEREBRO DE LA APP (Versión 4.2 - Corregida) ---
+// --- FUNCIÓN DE UTILIDAD (Ponla al inicio de app.js) ---
+function debounce(func, wait, immediate) {
+    let timeout;
+    return function() {
+        const context = this, args = arguments;
+        const later = function() {
+            timeout = null;
+            if (!immediate) func.apply(context, args);
+        };
+        const callNow = immediate && !timeout;
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+        if (callNow) func.apply(context, args);
+    };
+};
+// --- FIN DE FUNCIÓN DE UTILIDAD ---
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -51,6 +67,26 @@ document.addEventListener('DOMContentLoaded', () => {
     // Modal: Repetidas
     const conteoRepetidas = document.getElementById('conteo-repetidas');
     const btnCanjearRepetidas = document.getElementById('btn-canjear-repetidas');
+
+    /**
+     * NUEVO: Manejador para el cambio de tamaño de la ventana (resize)
+     * * Usamos "debounce" para que no se ejecute 100 veces por segundo
+     * al girar el celular, sino solo una vez que se estabiliza.
+     */
+    const handleResize = debounce(() => {
+        if (pageFlip && albumHaSidoRenderizado) {
+            console.log("Detectado cambio de tamaño (resize/rotación).");
+            
+            // Obtenemos el índice de la página actual
+            const currentIndex = pageFlip.getCurrentPageIndex();
+            
+            // ¡Reutilizamos tu función!
+            // Esta función ya sabe si debe poner la clase 'open' o no
+            // y ya sabe que debe llamar a 'pageFlip.update()' después
+            // del timeout. Es perfecta.
+            actualizarAnchoAlbum(currentIndex);
+        }
+    }, 400); // Espera 400ms después del último cambio para ejecutarse
     
 // --- 3. FUNCIONES DE LÓGICA ---
 
@@ -173,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /**
      * Espera a que la vista del álbum sea visible antes de renderizarlo.
-     * NUEVO (v7 - Corregido): YA NO USA .style.
+     * NUEVO: Ahora solo se asegura de que la clase 'open' no esté.
      */
     function renderizarAlbumConRetraso() {
         if (albumHaSidoRenderizado) return;
@@ -185,23 +221,21 @@ document.addEventListener('DOMContentLoaded', () => {
             if (visible) {
                 console.log("Vista del álbum visible. Forzando estado de tapa...");
                 
-                // --- ESTE ES EL CAMBIO CLAVE ---
-                // Quitamos los .style.maxWidth y .style.aspectRatio
-                // Solo nos aseguramos de que el libro esté CERRADO (sin la clase 'open')
-                albumContainer.classList.remove('open');
-                // --- FIN DEL CAMBIO ---
+                // --- NUEVO ---
+                // Forzamos el estado de TAPA (angosto) ANTES de inicializar
+                albumContainer.classList.remove('open'); // Nos aseguramos de que esté en estado "cover"
+                // --- FIN NUEVO ---
                 
-                // Damos 50ms al DOM para que aplique el CSS antes de renderizar
-                setTimeout(renderizarAlbum, 50); 
+                // Damos 10ms al DOM para que aplique el CSS antes de renderizar
+                setTimeout(renderizarAlbum, 350); 
 
             } else {
                 console.log("Esperando a que la vista sea visible...");
                 setTimeout(esperarVisibilidad, 100);
             }
         };
-        
-        // Empezamos a revisar (10ms es más rápido para el usuario)
-        setTimeout(esperarVisibilidad, 10);
+
+        setTimeout(esperarVisibilidad, 100);
     }
 
     /**
@@ -399,8 +433,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- CAMBIO HECHO: Esta es la nueva función de lógica de tamaño ---
     /**
-     * NUEVO (v7 - Corregido): Ajusta el tamaño usando CLASES
-     * y se actualiza en el siguiente "tick" del navegador.
+     * NUEVO (v6 - Sincronizado): Ajusta el tamaño del contenedor
+     * Y ESPERA a que la transición de CSS termine antes de actualizar la biblioteca.
      */
     function actualizarAnchoAlbum(indexPagina) {
         if (!pageFlip) return;
@@ -409,18 +443,22 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // 1. Cambiamos la CLASE CSS (esto es inmediato)
         if (indexPagina === 0 || indexPagina === totalPages - 1) {
+            // MODO TAPA (ANGOSTO)
             albumContainer.classList.remove('open');
         } else {
+            // MODO SPREAD (ANCHO)
             albumContainer.classList.add('open');
         }
         
-        // 2. (LA CLAVE) Esperamos "1 tick" del navegador para que APLIQUE la clase
-        //    (el CSS sin transición es instantáneo) y LUEGO actualizamos la biblioteca.
+        // 2. (LA CLAVE) ESPERAMOS a que la transición de CSS (300ms) termine
+        //    y LUEGO, Y SÓLO ENTONCES, actualizamos la biblioteca.
         setTimeout(() => {
             if (pageFlip) {
+                // Ahora, 350ms después, pageFlip.update() leerá
+                // las dimensiones FINALES y correctas.
                 pageFlip.update();
             }
-        }, 0); // 0ms es lo más rápido y correcto aquí.
+        }, 350); // 350ms es > 300ms (el tiempo de la transición en style.css)
     }
 
 
@@ -431,28 +469,31 @@ document.addEventListener('DOMContentLoaded', () => {
         // 1. Cambia la vista
         cambiarVista('view-album');
 
-        // --- LÓGICA DE INICIALIZACIÓN (PRIMERA VEZ) ---
+        // --- LÓGICA DE INICIALIZACIÓN (SOLO LA PRIMERA VEZ) ---
         if (!albumHaSidoRenderizado) {
-            // Llamamos a la función que se encargará de esperar
-            renderizarAlbumConRetraso();
-            return;
+            // Esta función (modificada) preparará el contenedor ANTES de renderizar
+            setTimeout(renderizarAlbumConRetraso, 100); 
+            return; // Importante: Salimos aquí la primera vez
         }
         
-        // --- LÓGICA PARA VECES POSTERIORES ---
-        // Al volver a esta vista, esperamos 50ms a que el CSS 
-        // de 'display: flex' se aplique y el contenedor tenga tamaño.
-        setTimeout(() => {
-            if (pageFlip) {
-                console.log("Restaurando vista de álbum...");
-                actualizarFiguritasEnAlbum();
-                
+        // --- LÓGICA PARA VECES POSTERIORES (EL ÁLBUM YA EXISTE) ---
+        const currentHeight = albumContainer.offsetHeight;
+        const bookRect = albumContainer.getBoundingClientRect();
+        
+        if (bookRect.width > 0 && pageFlip) {
+            console.log("Restaurando vista de álbum...");
+            actualizarFiguritasEnAlbum();
+            
+            // Usamos un timeout para asegurar que el DOM está listo
+            setTimeout(() => {
                 const currentIndex = pageFlip.getCurrentPageIndex();
                 actualizarBotonesNav(currentIndex);
-                
-                // Esta función ya tiene su propio timer de 0ms
-                actualizarAnchoAlbum(currentIndex);
-            }
-        }, 50); // 50ms es un tiempo seguro para que la vista se "pinte"
+                // Esta función re-aplicará el tamaño correcto (ancho o angosto)
+                actualizarAnchoAlbum(currentIndex); 
+            }, 100); 
+        } else {
+            console.warn("No se pudo actualizar el tamaño de PageFlip. Ancho: " + bookRect.width);
+        }
     });
 
     btnBackToHome.addEventListener('click', () => cambiarVista('view-home'));
@@ -553,6 +594,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // 4. Llama una vez a la función del sobre para estado inicial
         actualizarEstadoSobreDiario();
+
+        window.addEventListener('resize', handleResize);
     }
 
     inicializarApp();
