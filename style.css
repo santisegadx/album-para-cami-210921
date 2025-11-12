@@ -22,7 +22,7 @@ body, html {
     background-color: var(--color-fondo);
     color: var(--color-texto);
     line-height: 1.5;
-    height: 100dvh;
+    height: 100vh;
     overflow: hidden; /* Evita el scroll en la app */
 }
 
@@ -30,7 +30,7 @@ body, html {
 .view {
     display: none; /* Ocultas por defecto */
     width: 100%;
-    height: 100%;
+    height: 100vh;
     overflow: hidden;
 }
 
