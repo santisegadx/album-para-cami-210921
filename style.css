@@ -271,7 +271,7 @@ body, html {
 
 /* Estilos de la biblioteca page-flip */
 #flipbook {
-    width: 100;
+    width: 100%;
     height: 100%;
 
     /* --- NUEVO: FIX DE CENTRADO (v2) --- */
