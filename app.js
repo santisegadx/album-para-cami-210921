@@ -154,12 +154,8 @@ document.addEventListener('DOMContentLoaded', () => {
             pageFlip.on('changeState', (e) => {
                 // e.data es el nuevo estado, ej: "flipping" o "read"
                 if (e.data === 'read') {
-                    // Usamos un setTimeout para no corromper el estado de la biblioteca
-                    // mientras procesa el evento.
-                    setTimeout(() => {
-                        const currentIndex = pageFlip.getCurrentPageIndex();
-                        actualizarAnchoAlbum(currentIndex);
-                    }, 10); 
+                    // LLAMAMOS a la función INMEDIATAMENTE
+                    actualizarAnchoAlbum(pageFlip.getCurrentPageIndex());
                 }
             });
             // --- FIN DEL CAMBIO ---
@@ -177,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /**
      * Espera a que la vista del álbum sea visible antes de renderizarlo.
-     * NUEVO: Ahora también fuerza el tamaño de TAPA (angosto) antes de inicializar.
+     * NUEVO (v7 - Corregido): YA NO USA .style.
      */
     function renderizarAlbumConRetraso() {
         if (albumHaSidoRenderizado) return;
@@ -187,24 +183,25 @@ document.addEventListener('DOMContentLoaded', () => {
             const visible = estilos.display !== 'none' && albumContainer.offsetWidth > 0;
 
             if (visible) {
-                console.log("Vista del álbum visible. Forzando tamaño de tapa...");
+                console.log("Vista del álbum visible. Forzando estado de tapa...");
                 
-                // --- NUEVO ---
-                // Forzamos el tamaño de TAPA (angosto) ANTES de inicializar
-                albumContainer.style.maxWidth = '450px';
-                albumContainer.style.aspectRatio = '8 / 10';
-                // --- FIN NUEVO ---
+                // --- ESTE ES EL CAMBIO CLAVE ---
+                // Quitamos los .style.maxWidth y .style.aspectRatio
+                // Solo nos aseguramos de que el libro esté CERRADO (sin la clase 'open')
+                albumContainer.classList.remove('open');
+                // --- FIN DEL CAMBIO ---
                 
-                // Damos 10ms al DOM para que aplique el CSS antes de renderizar
-                setTimeout(renderizarAlbum, 10); 
+                // Damos 50ms al DOM para que aplique el CSS antes de renderizar
+                setTimeout(renderizarAlbum, 50); 
 
             } else {
                 console.log("Esperando a que la vista sea visible...");
                 setTimeout(esperarVisibilidad, 100);
             }
         };
-
-        setTimeout(esperarVisibilidad, 100);
+        
+        // Empezamos a revisar (10ms es más rápido para el usuario)
+        setTimeout(esperarVisibilidad, 10);
     }
 
     /**
@@ -402,30 +399,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- CAMBIO HECHO: Esta es la nueva función de lógica de tamaño ---
     /**
-     * NUEVO (v4 - CORREGIDO): Ajusta el tamaño del contenedor Y actualiza
-     * la biblioteca usando la API pública correcta.
+     * NUEVO (v7 - Corregido): Ajusta el tamaño usando CLASES
+     * y se actualiza en el siguiente "tick" del navegador.
      */
     function actualizarAnchoAlbum(indexPagina) {
         if (!pageFlip) return;
         
         const totalPages = pageFlip.getPageCount();
         
-        // 1. Cambiamos el CSS del contenedor
+        // 1. Cambiamos la CLASE CSS (esto es inmediato)
         if (indexPagina === 0 || indexPagina === totalPages - 1) {
-            // MODO TAPA (ANGOSTO)
-            albumContainer.style.maxWidth = '450px';
-            albumContainer.style.aspectRatio = '8 / 10';
+            albumContainer.classList.remove('open');
         } else {
-            // MODO SPREAD (ANCHO)
-            albumContainer.style.maxWidth = '900px';
-            albumContainer.style.aspectRatio = '16 / 10';
+            albumContainer.classList.add('open');
         }
         
-        // 2. Forzamos al navegador a aplicar el CSS (esto se llama reflow)
-        const currentWidth = albumContainer.offsetWidth; 
-    
-        // 3. (LA CLAVE) Llamamos a la API PÚBLICA correcta: .update()
-        pageFlip.update();
+        // 2. (LA CLAVE) Esperamos "1 tick" del navegador para que APLIQUE la clase
+        //    (el CSS sin transición es instantáneo) y LUEGO actualizamos la biblioteca.
+        setTimeout(() => {
+            if (pageFlip) {
+                pageFlip.update();
+            }
+        }, 0); // 0ms es lo más rápido y correcto aquí.
     }
 
 
@@ -436,31 +431,28 @@ document.addEventListener('DOMContentLoaded', () => {
         // 1. Cambia la vista
         cambiarVista('view-album');
 
-        // --- LÓGICA DE INICIALIZACIÓN (SOLO LA PRIMERA VEZ) ---
+        // --- LÓGICA DE INICIALIZACIÓN (PRIMERA VEZ) ---
         if (!albumHaSidoRenderizado) {
-            // Esta función (modificada) preparará el contenedor ANTES de renderizar
-            setTimeout(renderizarAlbumConRetraso, 100); 
-            return; // Importante: Salimos aquí la primera vez
+            // Llamamos a la función que se encargará de esperar
+            renderizarAlbumConRetraso();
+            return;
         }
         
-        // --- LÓGICA PARA VECES POSTERIORES (EL ÁLBUM YA EXISTE) ---
-        const currentHeight = albumContainer.offsetHeight;
-        const bookRect = albumContainer.getBoundingClientRect();
-        
-        if (bookRect.width > 0 && pageFlip) {
-            console.log("Restaurando vista de álbum...");
-            actualizarFiguritasEnAlbum();
-            
-            // Usamos un timeout para asegurar que el DOM está listo
-            setTimeout(() => {
+        // --- LÓGICA PARA VECES POSTERIORES ---
+        // Al volver a esta vista, esperamos 50ms a que el CSS 
+        // de 'display: flex' se aplique y el contenedor tenga tamaño.
+        setTimeout(() => {
+            if (pageFlip) {
+                console.log("Restaurando vista de álbum...");
+                actualizarFiguritasEnAlbum();
+                
                 const currentIndex = pageFlip.getCurrentPageIndex();
                 actualizarBotonesNav(currentIndex);
-                // Esta función re-aplicará el tamaño correcto (ancho o angosto)
-                actualizarAnchoAlbum(currentIndex); 
-            }, 10); 
-        } else {
-            console.warn("No se pudo actualizar el tamaño de PageFlip. Ancho: " + bookRect.width);
-        }
+                
+                // Esta función ya tiene su propio timer de 0ms
+                actualizarAnchoAlbum(currentIndex);
+            }
+        }, 50); // 50ms es un tiempo seguro para que la vista se "pinte"
     });
 
     btnBackToHome.addEventListener('click', () => cambiarVista('view-home'));

@@ -16,6 +16,21 @@
 </head>
 <body>
 
+        <!-- Pantalla de acceso -->
+    <div id="login" style="text-align:center; margin-top: 20vh;">
+        <h2>💖 Ingresá la clave</h2>
+        <input type="password" id="password" placeholder="Escribí la clave" 
+                style="padding:0.6rem; border-radius:8px; border:1px solid #ccc;">
+        <button onclick="checkPassword()" 
+                style="margin-left:0.5rem; padding:0.6rem 1rem; border-radius:8px; border:none; background:#ff9fcf; cursor:pointer;">
+        Entrar
+        </button>
+        <p id="error" style="color:red; display:none;">Clave incorrecta 😅</p>
+    </div>
+
+<!-- Contenido real del álbum -->
+<div id="content" style="display:none;">
+
     <!-- Vista 1: Portada (Home) -->
     <section id="view-home" class="view activa">
         <div class="home-background-collage">
@@ -123,5 +138,19 @@
     <script src="pageflip.min.js"></script> <!-- La biblioteca -->
     <script src="data.js"></script>
     <script src="app.js"></script>
+
+   <script>
+     const PASSWORD = "teamo2025"; // 💕 Cambiala por la que quieras
+
+     function checkPassword() {
+       const input = document.getElementById("password").value;
+       if (input === PASSWORD) {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("content").style.display = "block";
+      } else {
+        document.getElementById("error").style.display = "block";
+      }
+    }
+  </script>
 </body>
 </html>

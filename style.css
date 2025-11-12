@@ -172,21 +172,57 @@ body, html {
     color: white;
     border: none;
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    font-size: 1.5rem;
+    /* CAMBIO DE px A rem */
+    width: 2.5rem;  /* (40px) */
+    height: 2.5rem; /* (40px) */
+    font-size: 1.25rem;
+    /* FIN CAMBIO */
     cursor: pointer;
     z-index: 1010;
 }
 
 /* CAMBIO: Contenedor del libro (no es pantalla completa) */
 #album-container {
-    width: 90vw;
-    height: 70vh;
-    max-width: 900px;
-    max-height: 600px;
-    aspect-ratio: 16 / 10; /* Proporción de libro abierto */
+    /* --- ESTADO DE TAPA (POR DEFECTO) --- */
+    width: 90vw; /* En pantallas pequeñas, ocupa el 90% del ancho */
+    max-width: 450px; /* En pantallas grandes, no mide más de 450px */
+    aspect-ratio: 8 / 10;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+/* --- ESTADO ABIERTO (CON LA CLASE) --- */
+#album-container.open {
+    max-width: 900px;
+    aspect-ratio: 16 / 10;
+}
+
+/* --- MEDIA QUERIES (RESPONSIVE) --- */
+
+/* 1. Para teléfonos (pantallas de 600px o menos) */
+@media (max-width: 600px) {
+    #album-container.open {
+        /* Hacemos que el álbum abierto ocupe el 90% del ancho,
+           ignorando el max-width de 900px */
+        width: 90vw;
+        max-width: 90vw;
+    }
+}
+
+/* 2. Para monitores grandes (donde el alto es la limitación) */
+@media (min-width: 1000px) {
+    /* En pantallas muy anchas, basamos el tamaño en el ALTO
+       para que no sea gigantesco */
+       
+    #album-container {
+        width: auto; /* Dejamos que el alto mande */
+        height: 70vh; /* 70% del alto de la ventana */
+        max-width: 450px; /* Aún respetamos el max-width de la tapa */
+    }
+    
+    #album-container.open {
+        height: 80vh; /* El libro abierto puede ser un poco más alto */
+        max-width: none; /* Dejamos que el 'height' y 'aspect-ratio' definan el ancho */
+    }
 }
 
 /* CAMBIO: Botones de navegación externos */
@@ -195,13 +231,16 @@ body, html {
     color: white;
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    /* CAMBIO DE px A rem */
+    width: 3rem;  /* (50px) */
+    height: 3rem; /* (50px) */
     font-size: 1.5rem;
+    /* FIN CAMBIO */
     cursor: pointer;
     z-index: 1005;
     transition: background 0.2s ease;
 }
+
 .album-nav-btn:hover {
     background: rgba(255, 255, 255, 0.4);
 }
@@ -210,6 +249,21 @@ body, html {
 #flipbook {
     width: 100%;
     height: 100%;
+
+    /* --- NUEVO: FIX DE CENTRADO (v2) --- */
+    /* Forzamos al contenedor de la biblioteca a centrar su contenido */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Evita desbordes durante la animación */
+}
+
+/* Esto es un "seguro extra". Le decimos al libro 
+  que no se encoja (flex-shrink: 0) 
+*/
+#flipbook .st-flipbook {
+    margin: 0 auto !important; /* El !important es por si la librería lo sobreescribe */
+    flex-shrink: 0;
 }
 
 .page {
