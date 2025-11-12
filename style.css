@@ -192,7 +192,7 @@ body, html {
 /* CAMBIO: Contenedor del libro (no es pantalla completa) */
 #album-container {
     /* --- ESTADO DE TAPA (POR DEFECTO) --- */
-    width: 90vw; /* En pantallas pequeñas, ocupa el 90% del ancho */
+    width: 60vw; /* En pantallas pequeñas, ocupa el 90% del ancho */
     max-width: 450px; /* En pantallas grandes, no mide más de 450px */
     aspect-ratio: 8 / 10;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
