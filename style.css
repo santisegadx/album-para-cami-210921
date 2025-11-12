@@ -207,34 +207,6 @@ body, html {
     aspect-ratio: 16 / 10;
 }
 
-/* --- MEDIA QUERIES (RESPONSIVE) --- */
-
-/* 1. Para teléfonos (pantallas de 600px o menos) */
-@media (max-width: 600px) {
-    #album-container.open {
-        /* Hacemos que el álbum abierto ocupe el 90% del ancho,
-           ignorando el max-width de 900px */
-        width: 90vw;
-        max-width: 90vw;
-    }
-}
-
-/* 2. Para monitores grandes (donde el alto es la limitación) */
-@media (min-width: 1000px) {
-    /* En pantallas muy anchas, basamos el tamaño en el ALTO
-       para que no sea gigantesco */
-       
-    #album-container {
-        width: auto; /* Dejamos que el alto mande */
-        height: 70vh; /* 70% del alto de la ventana */
-        max-width: 450px; /* Aún respetamos el max-width de la tapa */
-    }
-    
-    #album-container.open {
-        height: 80vh; /* El libro abierto puede ser un poco más alto */
-        max-width: none; /* Dejamos que el 'height' y 'aspect-ratio' definan el ancho */
-    }
-}
 
 /* CAMBIO: Botones de navegación externos */
 .album-nav-btn {
@@ -264,6 +236,7 @@ body, html {
     /* --- NUEVO: FIX DE CENTRADO (v2) --- */
     /* Forzamos al contenedor de la biblioteca a centrar su contenido */
     display: flex;
+    
     justify-content: center;
     align-items: center;
     overflow: hidden; /* Evita desbordes durante la animación */
